@@ -3,7 +3,7 @@ module SemiCircle
 using Random
 using LinearAlgebra
 using MDPs
-import MDPs: state_space, action_space, discount_factor, horizon, action_meaning, state, action, reward, reset!, step!, in_absorbing_state, visualize
+import MDPs: state_space, action_space, action_meaning, state, action, reward, reset!, step!, in_absorbing_state, visualize
 using Luxor
 using Luxor.Colors
 using UnPack
@@ -15,7 +15,6 @@ mutable struct SemiCircleEnv{T<:AbstractFloat} <: AbstractMDP{Vector{T}, Vector{
     Rc::Float64
     Rg::Float64
 
-    horizon::Int
     𝕊::VectorSpace{T}
     𝔸::VectorSpace{T}
 
@@ -23,17 +22,15 @@ mutable struct SemiCircleEnv{T<:AbstractFloat} <: AbstractMDP{Vector{T}, Vector{
     action::Vector{T} # ω, 𝑣
     reward::Float64
 
-    function SemiCircleEnv{T}(θg; Rc::Real=0.5, Rg::Real=0.2, horizon::Integer=50) where T<:AbstractFloat
+    function SemiCircleEnv{T}(θg; Rc::Real=1, Rg::Real=0.2) where T<:AbstractFloat
         sspace = VectorSpace{T}(T[-1, -1, -Rc, 0], T[1, 1, Rc, Rc])
         aspace = VectorSpace{T}(T[-2π, -1], T[2π, 1])
-        new{T}(θg, Rc, Rg, horizon, sspace, aspace, zeros(T, 4), zeros(T, 2), 0.0)
+        new{T}(θg, Rc, Rg, sspace, aspace, zeros(T, 4), zeros(T, 2), 0.0)
     end
 end
 
 @inline state_space(sc::SemiCircleEnv) = sc.𝕊
 @inline action_space(sc::SemiCircleEnv) = sc.𝔸
-@inline horizon(sc::SemiCircleEnv) = sc.horizon
-@inline discount_factor(sc::SemiCircleEnv) = 0.99
 
 function reset!(sc::SemiCircleEnv; rng::AbstractRNG=Random.GLOBAL_RNG)
     θ, x, y = rand(rng) * π, 0, 0
@@ -79,7 +76,7 @@ function in_absorbing_state(sc::SemiCircleEnv)::Bool
     return distance_to_goal(sc) <= sc.Rg
 end
 
-function visualize(sc::SemiCircleEnv, s::Vector{Float32})::Matrix{ARGB32}
+function visualize(sc::SemiCircleEnv, s::Vector{Float32}; kwargs...)::Matrix{ARGB32}
     @unpack Rc, Rg, θg = sc
     W, H = Int.(ceil.((200(Rc+Rg), 100(Rc+Rg))))
     Drawing(W, H + 6, :image)
