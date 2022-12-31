@@ -1,7 +1,7 @@
 name = "SemiCircle"
 uuid = "a63ccf80-249e-49a2-b5cb-9f9154b80f8b"
 authors = ["Abhinav Bhatia <abhinav.bhatia.me@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"

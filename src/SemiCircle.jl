@@ -76,7 +76,7 @@ function in_absorbing_state(sc::SemiCircleEnv)::Bool
     return distance_to_goal(sc) <= sc.Rg
 end
 
-function visualize(sc::SemiCircleEnv, s::Vector{Float32}; kwargs...)::Matrix{ARGB32}
+function visualize(sc::SemiCircleEnv, s::Vector{Float32}; vs=nothing, kwargs...)::Matrix{ARGB32}
     @unpack Rc, Rg, θg = sc
     W, H = Int.(ceil.((200(Rc+Rg), 100(Rc+Rg))))
     Drawing(W, H + 6, :image)
@@ -100,6 +100,24 @@ function visualize(sc::SemiCircleEnv, s::Vector{Float32}; kwargs...)::Matrix{ARG
     circle(Point(100x, -100y), 5Rc, :fill)
     setdash("solid")
     line(Point(100x, -100y), Point(100(x + 0.1 * cosθ), -100(y + 0.1 * sinθ)), :stroke)
+
+    if vs !== nothing
+        vs_ = Dict()
+        for s in keys(vs)
+            sinθ, cosθ, x, y = s
+            v = vs[s]
+            if haskey(vs_, (x, y))
+                vs_[(x, y)] = max(v, vs_[(x, y)])
+            else
+                vs_[(x, y)] = v
+            end
+            v = vs_[(x, y)]
+            vmax = 1
+            color = RGB(1-abs(v)/vmax, 1, 1-abs(v)/vmax)
+            setcolor(color)
+            circle(Point(100x, -100y), 2, :fill)
+        end
+    end
 
     return image_as_matrix()
 end
