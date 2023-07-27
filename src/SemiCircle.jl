@@ -10,6 +10,16 @@ using UnPack
 
 export SemiCircleEnv
 
+"""
+    SemiCircleEnv{T<:AbstractFloat}(θg; Rc=1, Rg=0.2)
+
+A semi-circle environment with a goal placed on a semi-circle at `θg` radians. The agent starts at the bottom of the semi-circle in the middle and has to reach the goal. The agent can move forward and backward and can turn left and right. The action space is `[-2π, 2π] × [-1, 1]`, with the first component being the angular velocity and the second component being the velocity. The state space is `[-1, 1] × [-1, 1] × [-Rc, Rc] × [0, Rc]`, with the first two components being the sine and cosine of the angle, the third component being the x-coordinate, and the fourth component being the y-coordinate. The reward is `1` if the agent reaches the goal and `0` otherwise. Read more about this environment in https://arxiv.org/pdf/1903.08254.pdf and https://arxiv.org/pdf/1905.06424.pdf Appendix G.1.
+
+# Arguments
+- `θg`: the goal angle in radians
+- `Rc`: the radius of the semi-circle (default: `1`)
+- `Rg`: the radius of the goal circle (default: `0.2`)
+"""
 mutable struct SemiCircleEnv{T<:AbstractFloat} <: AbstractMDP{Vector{T}, Vector{T}}
     θg::Float64
     Rc::Float64
